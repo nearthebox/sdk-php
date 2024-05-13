@@ -25,6 +25,11 @@ class HttpClient
         $this->logger = LogFactory::getLog(get_class($this));
     }
 
+    protected function getHeaders()
+    {
+        return array();
+    }
+
     /**
      * Set a log file.
      *
@@ -83,10 +88,14 @@ class HttpClient
             return false;
         }
 
-        if (preg_match('/xml/',$post_url)) {
-            curl_setopt($curl_request, CURLOPT_HTTPHEADER, Array("Content-Type: text/json"));
-//            file_put_contents($this->_log_file, "\nSending 'XML' Request type", FILE_APPEND);
-            $this->logger->info("Sending 'XML' Request type");
+        $headers = $this->getHeaders();
+
+        if (preg_match('/xml/', $post_url)) {
+            $headers[] = "Content-Type: text/json";
+        }
+
+        if (! empty($headers)) {
+            curl_setopt($curl_request, CURLOPT_HTTPHEADER, $headers);
         }
 
         try
